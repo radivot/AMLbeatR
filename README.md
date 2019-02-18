@@ -48,7 +48,8 @@ wilcox.test(D$LDH~D$FLT3c) #P=0.06
 t.test(log10(D$LDH)~D$FLT3c) #P=0.17
 ``` 
 
-If we instead use FLT3 variant calls in v rather than those in clin, P=0.005 signifance is reached. 
+If we instead use FLT3 variant calls in v, P=0.005 signifance is reached. We conclude from this that the clinical data fields
+FLT3c and NPM1c in clin should probably be ignored, as they appear to be ~10-fold more noisy in terms of P values. 
 
 ![](docs/LdhFLT3.png)
 ```
@@ -65,6 +66,34 @@ ggsave("~/Results/AML/LdhFLT3.png",width=4,height=3)
 wilcox.test(D$LDH~D$State) #P=0.004963
 t.test(log10(D$LDH)~D$State) #0.02673
 ```
+
+The next question is, within FLT3 mutants called by v, is there a correlation between LDH and VAF? 
+![](docs/LdhFLT3vaf.png)
+
+
+```
+head(v,3)
+sv=v%>%filter(symbol=="FLT3")%>%select(lid=labId,t_vaf,ref,alt)%>%mutate(insLen=str_length(alt)-str_length(ref))
+head(sv)
+table(sv$insLen) #all in frame as expected. 
+# Now focus on biggest clones and insertions
+sv=sv%>%group_by(lid)%>%summarize(vaf=max(t_vaf,na.rm=T),insLen=max(insLen,na.rm=T))
+D=d%>%unnest()
+D=left_join(D,sv)
+gx=xlab("FLT3 mutant VAF")
+D%>%filter(!is.na(vaf))%>%ggplot(aes(x=vaf,y=LDH))+gx+tc(15)+geom_point()+geom_smooth(method="loess")
+ggsave("~/Results/AML/LdhFLT3vaf.png",width=4,height=3)
+summary(lm(expr~vaf,data=D%>%filter(vaf>0))) # P = 0.000635
+```
+
+Finally, what about LDH and insertion length? 
+![](docs/LdhFLT3insLen.png)
+```
+gx=xlab("FLT3 mutant Insertion Length")
+D%>%filter(!is.na(insLen),!is.na(LDH))%>%ggplot(aes(x=insLen,y=LDH))+gx+tc(15)+geom_point()+geom_smooth(method="loess")
+ggsave("~/Results/AML/LdhFLT3insLen.png",width=4,height=3)
+```
+
 
 
 
