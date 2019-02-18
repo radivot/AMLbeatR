@@ -15,14 +15,14 @@ mkBeatAML(beatHome = "~/data/BeatAML",
 \item{outFile}{Name of binary output file, which will be placed in \code{beatHome}.}
 }
 \value{
-Tibble (big data file) saved as d in \code{outFile}.
+Nothing returned. Tibbles v (WES variants), cpm (RNAseq counts per million) and clin are in \code{outFile}.
 }
 \description{
-Converts sheets in the Supplementary Tables excel file 
-of J.W. Tyner et al. (Nature 562 2018) into a list-column tibble.
+Converts sheets 5,7, 9, 12 1nd 13 in the Supplementary Tables excel file 
+of J.W. Tyner et al. (Nature 562 2018) into tibbles in an R binary file.
 }
 \note{
-Inspired by Chapter 25 in R4DS, with countries as patients.
+The goal here is simply to make reading the files into R faster
 }
 \examples{
 library(AMLbeatR)
