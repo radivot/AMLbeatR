@@ -6,7 +6,7 @@ Author: Tomas Radivoyevitch
 Maintainer: Tomas Radivoyevitch <radivot@ccf.org>
 Description: The goal of this project is to organize Beat AML Data as a list-column tibble.
 Encoding: UTF-8
-Depends: dplyr, openxlsx, tidyr 
+Depends: dplyr, openxlsx, tidyr, stringr 
 License: GPL (>= 2)
 LazyData: true
 RoxygenNote: 6.1.1

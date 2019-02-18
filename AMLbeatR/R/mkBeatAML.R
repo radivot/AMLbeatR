@@ -14,7 +14,7 @@
 #' mkBeatAML()
 #'@name mkBeatAML
 #'@export
-#'@import openxlsx dplyr
+#'@import openxlsx
 
 mkBeatAML<-function(beatHome="~/data/BeatAML",beatFile="41586_2018_623_MOESM3_ESM.xlsx",outFile="beatAML")  {
   # library(dplyr)
