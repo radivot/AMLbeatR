@@ -10,14 +10,14 @@ devtools::install_github("radivot/AMLbeatR",subdir="AMLbeatR")
 ```
 
 ## Beat AML Data
-To use AMLbeatR you must first download an excel file with 24 tables/sheets found in the  [Supplementary information section](https://www.nature.com/articles/s41586-018-0623-z#Sec38) of the Nature paper cited above. On this page, the [Supplementary Information link](https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-018-0623-z/MediaObjects/41586_2018_623_MOESM1_ESM.pdf) leads to a pdf that summarizes the sheets and the link [Supplementary Table](https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-018-0623-z/MediaObjects/41586_2018_623_MOESM3_ESM.xlsx) is the link to the data file of interest, a 24-sheet/table, 290-MB excel file named 41586_2018_623_MOESM3_ESM.xlsx.
+To use AMLbeatR you must first download a large excel file from  [Supplementary information](https://www.nature.com/articles/s41586-018-0623-z#Sec38) of the 2018 Nature paper cited above. Therein [Supplementary Information link](https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-018-0623-z/MediaObjects/41586_2018_623_MOESM1_ESM.pdf)summarizes the sheets in the file and [Supplementary Table](https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-018-0623-z/MediaObjects/41586_2018_623_MOESM3_ESM.xlsx) is the 290-MB excel data file of interest.
 
 ## Make R Binary Data
-Place the file 41586_2018_623_MOESM3_ESM.xlsx in the folder ~/data/BeatAML where ~ is your home directory. 
+Place the large file (41586_2018_623_MOESM3_ESM.xlsx) in the folder ~/data/BeatAML, where ~ is your home directory. 
 
 ```
 library(AMLbeatR)  #loads installed package AMLbeatR into memory 
-mkBeatTib()        #makes data file ~/data/BeatAML/BeatAML.Rdata
+mkBeatAML()        #makes data file ~/data/BeatAML/BeatAML.Rdata
 ```
 
 

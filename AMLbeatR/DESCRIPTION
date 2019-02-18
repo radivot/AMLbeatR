@@ -4,7 +4,9 @@ Title: Facilitates Beat AML Data Analyses
 Version: 0.1.0
 Author: Tomas Radivoyevitch
 Maintainer: Tomas Radivoyevitch <radivot@ccf.org>
-Description: Organizes Beat AML Data as a list-column tibble for R4DS-Chapter-25-style processing
-License: GPL (>= 2)
+Description: The goal of this project is to organize Beat AML Data as a list-column tibble.
 Encoding: UTF-8
+Depends: dplyr, openxlsx 
+License: GPL (>= 2)
 LazyData: true
+RoxygenNote: 6.1.1
