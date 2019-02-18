@@ -33,7 +33,7 @@ intp=intersect(De$id,Dv$id) #376 patients have RNA and DNA reads
 ## Example 1
 It was recently [reported](https://www.ncbi.nlm.nih.gov/pubmed/29665898) 
 that Lactate Dehydrogenase levels in the plasma are higher in AML patients with FLT3-ITD mutations. Using only data 
-in the tibble clin the following code shows minimal differences
+in the clinical data tibble clin the following code shows minimal differences
 ![](docs/LdhFLT3C.png)
 
 ```
@@ -48,6 +48,23 @@ wilcox.test(D$LDH~D$FLT3c) #P=0.06
 t.test(log10(D$LDH)~D$FLT3c) #P=0.17
 ``` 
 
+If we instead use FLT3 variant calls in v rather than those in clin, P=0.005 signifance is reached. 
+
+![](docs/LdhFLT3.png)
+```
+sv=v%>%mutate(sym=ifelse(symbol=="FLT3","Mutant","WT"))%>%select(lid=labId,sym)
+sv=sv%>%group_by(lid)%>%nest()
+getM=function(x) sum(str_detect(x$sym,"Mutant"))>0 
+sv=sv%>%mutate(State=map_lgl(data,getM))%>%select(-data)
+sv$State=c("WT","Mutant")[sv$State+1]
+D=left_join(D,sv)
+D=D%>%filter(!is.na(State))
+D%>%ggplot(aes(x=State,y=LDH))+scale_y_log10()+geom_boxplot(alpha=0)+geom_jitter(width=.15)+
+  ylab("Lactate Dehydrogenase")+tc(14)
+ggsave("~/Results/AML/LdhFLT3.png",width=4,height=3)
+wilcox.test(D$LDH~D$State) #P=0.004963
+t.test(log10(D$LDH)~D$State) #0.02673
+```
 
 
 
