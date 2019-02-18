@@ -23,9 +23,11 @@ mkBeatAML()        #makes data file ~/data/BeatAML/BeatAML.Rdata
 
 Check the R binary using 
 ```
-load("~/data/BeatAML/BeatAML.RData") #loads d, clinical, variant, and expression tibbles into memory 
-head(d,3)   #shows top 3 rows of d. Rows are patients and list columns handle multiple samples per patient.
+load("~/data/BeatAML/BeatAML.RData") #loads  clinical (clin), variant (v), and expression (cpm) tibbles into memory 
+d=mkListColTib(clin,v,cpm)  #make list column tibble out clin
+View(d)   #Rows are patients and data is a list column that handles multiple samples per patient.
 ``` 
+
 
 
 
