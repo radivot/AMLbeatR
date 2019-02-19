@@ -94,8 +94,61 @@ D%>%filter(!is.na(insLen),!is.na(LDH))%>%ggplot(aes(x=insLen,y=LDH))+gx+tc(15)+g
 ggsave("~/Results/AML/LdhFLT3insLen.png",width=4,height=3)
 ```
 
+## Example 2
+It was recently [reported](https://www.nejm.org/doi/full/10.1056/NEJMoa1516192) 
+that among the four combinations of DNMT3A and NPM1 mutations, FLT3 mutations change survival 
+the most when DNMT3A and NPM1 are both mutated. This result is replicated nicely below.
 
+```
+###### Survival
+library(survival);library(survminer)
+sv=v%>%filter(symbol%in%c("FLT3","DNMT3A","NPM1"))%>%select(lid=labId,sym=symbol,t_vaf)
+sv=sv%>%group_by(lid,sym)%>%summarize(vaf=max(t_vaf,na.rm=T))
+(sv=sv%>%mutate(sym=str_sub(sym,1,1)))
+sv=sv%>%group_by(lid)%>%nest()
+sv=sv%>%mutate(State=map(data,function(x) str_c(x$sym,collapse="")))%>%select(-data)
+sv=sv%>%unnest()
+D=d%>%unnest()
+D=left_join(D,sv)
+D=D%>%group_by(id,surv,status)%>%nest()
+getLong=function(x) x$State[str_length(x$State)==max(str_length(x$State))]
+getFirst=function(x) x[1]
+D=D%>%mutate(State=map(data,getLong))%>%select(-data)
+D=D%>%mutate(State1=map(State,getFirst))%>%select(-State)
+D=D%>%unnest()
+D$State1[is.na(D$State1)]="WT"
+table(D$State1,useNA="always")
+D1=D%>%filter(State1%in%c("WT","F"))
+gy=ylab("Survival Probability")
+gx=xlab("Days")
+fit=survfit(Surv(surv,status)~State1,data=D1) 
+labs=c("F","None")
+ggsurvplot(fit,D1,legend.title="",legend.labs=labs,pval=T,pval.coord=c(0.1,0.1))+gy+gx
+ggsave("~/Results/AML/surv.png",width=4,height=3)
 
+D2=D%>%filter(State1%in%c("D","DF"))
+fit=survfit(Surv(surv,status)~State1,data=D2) 
+labs=c("D","DF")
+ggsurvplot(fit,D2,legend.title="",legend.labs=labs,pval=T)+gy+gx
+ggsave("~/Results/AML/Dsurv.png",width=4,height=3)
+
+D3=D%>%filter(State1%in%c("N","FN"))
+fit=survfit(Surv(surv,status)~State1,data=D3) 
+labs=c("FN","N")
+ggsurvplot(fit,D3,legend.title="",legend.labs=labs,pval=T)+gy+gx
+ggsave("~/Results/AML/Nsurv.png",width=4,height=3)
+
+D4=D%>%filter(State1%in%c("DN","DFN"))
+fit=survfit(Surv(surv,status)~State1,data=D4) 
+labs=c("DFN","DN")
+ggsurvplot(fit,D4,legend.title="",legend.labs=labs,pval=T)+gy+gx
+ggsave("~/Results/AML/DNsurv.png",width=4,height=3)
+```
+
+![](docs/surv.png)
+![](docs/Dsurv.png)
+![](docs/Nsurv.png)
+![](docs/DNsurv.png)
 
 
 
