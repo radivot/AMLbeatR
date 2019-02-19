@@ -116,39 +116,31 @@ getFirst=function(x) x[1]
 D=D%>%mutate(State=map(data,getLong))%>%select(-data)
 D=D%>%mutate(State1=map(State,getFirst))%>%select(-State)
 D=D%>%unnest()
+D=D%>%mutate(surv=surv/365.25) # make in Years
 D$State1[is.na(D$State1)]="WT"
-table(D$State1,useNA="always")
 D1=D%>%filter(State1%in%c("WT","F"))
-gy=ylab("Survival Probability")
-gx=xlab("Days")
-fit=survfit(Surv(surv,status)~State1,data=D1) 
-labs=c("F","None")
-ggsurvplot(fit,D1,legend.title="",legend.labs=labs,pval=T,pval.coord=c(0.1,0.1))+gy+gx
-ggsave("~/Results/AML/surv.png",width=4,height=3)
-
 D2=D%>%filter(State1%in%c("D","DF"))
-fit=survfit(Surv(surv,status)~State1,data=D2) 
-labs=c("D","DF")
-ggsurvplot(fit,D2,legend.title="",legend.labs=labs,pval=T)+gy+gx
-ggsave("~/Results/AML/Dsurv.png",width=4,height=3)
-
 D3=D%>%filter(State1%in%c("N","FN"))
-fit=survfit(Surv(surv,status)~State1,data=D3) 
-labs=c("FN","N")
-ggsurvplot(fit,D3,legend.title="",legend.labs=labs,pval=T)+gy+gx
-ggsave("~/Results/AML/Nsurv.png",width=4,height=3)
-
 D4=D%>%filter(State1%in%c("DN","DFN"))
-fit=survfit(Surv(surv,status)~State1,data=D4) 
-labs=c("DFN","DN")
-ggsurvplot(fit,D4,legend.title="",legend.labs=labs,pval=T)+gy+gx
-ggsave("~/Results/AML/DNsurv.png",width=4,height=3)
-```
+D1$grp="None"; D2$grp="D"; D3$grp="N"; D4$grp="DN";
+D=bind_rows(D1,D2,D3,D4)
+labs=c("Fwt","Fmut")
+D$F=labs[str_detect(D$State1,"F")+1]
+D=as.data.frame(D) #fixes survplot error 
+D$grp=factor(D$grp,c("None","D","N","DN"))
+D$F=factor(D$F,c("Fwt","Fmut"))
+fit=survfit(Surv(surv,status)~F,data=D)
 
-![](docs/surv.png)
-![](docs/Dsurv.png)
-![](docs/Nsurv.png)
-![](docs/DNsurv.png)
+sbb=theme(strip.background=element_blank())
+gy=ylab("Survival Probability")
+gx=xlab("Years")
+svts=scale_x_continuous(breaks=c(0,2,4,6,8,10))#surv times
+lg=theme(legend.margin=margin(0,0,0,0),legend.position=c(0.9,0.85))#,legend.direction="horizontal")
+ggsurvplot_facet(fit,D,legend.title="",facet.by="grp",nrow=1,short.panel.labs=T,
+                 xlim=c(0,10),pval=T,pval.coord=c(3,0.45))+svts+sbb+gy+gx+lg
+ggsave("~/Results/AML/survALL.png",width=7,height=3)
+```
+![](docs/survALL.png)
 
 
 
