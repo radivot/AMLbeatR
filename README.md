@@ -145,6 +145,7 @@ ggsave("~/Results/AML/survALL.png",width=7,height=3)
 One might then wish to know which genes are most differentially expressed in DN with F wt vs mutated.
 
 ```
+
 ###### Differential Gene Expression 
 sv=v%>%filter(symbol%in%c("FLT3","DNMT3A","NPM1"))%>%select(lid=labId,sym=symbol,t_vaf)
 sv=sv%>%group_by(lid,sym)%>%summarize(vaf=max(t_vaf,na.rm=T))
@@ -164,11 +165,18 @@ pD=data.frame(sv)
 library(Biobase)
 head(meta)
 rownames(expr)=meta[,2]
+# expr=log2(expr+1)
 eset=ExpressionSet(assayData=expr)
+I=apply(expr,1,median)
+# I=I>2
+I=I>1
+eset=eset[I,]
+eset
 rownames(pD)=int
 pD$State=factor(pD$State,c("DN","DFN"))
 pData(eset)=pD
 exprs(eset)
+eset
 library(limma)
 (design=model.matrix(~pD$State))
 v <- voom(eset,design,plot=TRUE,normalize="quantile")
@@ -177,18 +185,17 @@ efitM <- eBayes(fit)
 tb=topTable(efitM, coef=2, adjust="BH",number=2000)
 View(tb)
 head(tb,10)
-
-               logFC    AveExpr        t      P.Value    adj.P.Val         B
-ZDHHC15     1.934165  0.1391686 7.806128 1.101961e-09 0.0000251721 11.564851
-WDR86       3.472813  1.8991429 7.255641 6.562640e-09 0.0000749552  9.795647
-FAM47E      1.759637  0.6478391 6.949427 1.787144e-08 0.0001360791  8.895032
-SOCS2-AS1   3.005238  1.7027505 6.794346 2.974056e-08 0.0001688394  8.404926
-FGF10       1.863137  0.2197871 6.728301 3.695649e-08 0.0001688394  8.402907
-VSTM4       2.270231  0.6741885 6.537060 6.938344e-08 0.0002381041  7.765783
-ALDH2       2.804879  3.7241013 6.521796 7.296452e-08 0.0002381041  7.455473
-CFH         3.540089  2.9151426 6.468061 8.711087e-08 0.0002487342  7.307661
-WDR86-AS1   2.100319  1.0443320 6.110932 2.831577e-07 0.0007186858  6.422627
-RP3-462E2.3 1.072174 -0.2477018 5.969029 4.523375e-07 0.0010332746  6.269707
+             logFC  AveExpr        t      P.Value   adj.P.Val        B
+ALDH2     2.821242 3.724876 6.428361 9.989863e-08 0.001191195 7.307082
+CFH       3.594912 2.902327 6.277209 1.644615e-07 0.001191195 6.845075
+SOCS2-AS1 3.078177 1.679220 6.016503 3.887055e-07 0.001876929 5.982933
+MAGED1    1.573360 5.906167 5.879442 6.108073e-07 0.002212039 5.951419
+C10orf128 2.752168 2.680110 5.481284 2.262538e-06 0.006555025 4.532447
+APOL4     2.855428 1.773715 5.383254 3.119253e-06 0.007530917 4.203965
+FAM92A1P1 1.414314 1.202226 5.312485 3.931300e-06 0.008135545 3.967188
+SOCS2     3.528358 4.205840 5.229939 5.146555e-06 0.008283666 3.881300
+FAM92A1   1.643208 2.368172 5.237830 5.015865e-06 0.008283666 3.792786
+FAM124A   1.905130 1.840115 5.181353 6.029025e-06 0.008733646 3.614365
 ```
 
 
