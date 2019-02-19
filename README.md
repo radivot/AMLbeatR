@@ -142,6 +142,53 @@ ggsave("~/Results/AML/survALL.png",width=7,height=3)
 ```
 ![](docs/survALL.png)
 
+One might then wish to know which genes are most differentially expressed in DN with F wt vs mutated.
 
+```
+###### Differential Gene Expression 
+sv=v%>%filter(symbol%in%c("FLT3","DNMT3A","NPM1"))%>%select(lid=labId,sym=symbol,t_vaf)
+sv=sv%>%group_by(lid,sym)%>%summarize(vaf=max(t_vaf,na.rm=T))
+(sv=sv%>%mutate(sym=str_sub(sym,1,1)))
+sv=sv%>%group_by(lid)%>%nest()
+sv=sv%>%mutate(State=map(data,function(x) str_c(x$sym,collapse="")))%>%select(-data)
+sv=sv%>%unnest()
+sv=sv%>%filter(State%in%c("DN","DFN"))  #66 have DN or DFN statue
+eids=names(cpm)[-c(1:2)] #451 RNAseq measurements
+int=intersect(eids,sv$lid) #40 with DN status have GE
+sv=sv%>%filter(lid%in%int)
+D=d%>%unnest()
+D=D%>%filter(lid%in%int)%>%arrange(id) # 1246 254; 1532 424; 2538 261 days later
+meta=cpm[names(cpm)[1:2]]
+expr=as.matrix(cpm[int])
+pD=data.frame(sv)
+library(Biobase)
+head(meta)
+rownames(expr)=meta[,2]
+eset=ExpressionSet(assayData=expr)
+rownames(pD)=int
+pD$State=factor(pD$State,c("DN","DFN"))
+pData(eset)=pD
+exprs(eset)
+library(limma)
+(design=model.matrix(~pD$State))
+v <- voom(eset,design,plot=TRUE,normalize="quantile")
+fit <- lmFit(v,design)
+efitM <- eBayes(fit)
+tb=topTable(efitM, coef=2, adjust="BH",number=2000)
+View(tb)
+head(tb,10)
+
+               logFC    AveExpr        t      P.Value    adj.P.Val         B
+ZDHHC15     1.934165  0.1391686 7.806128 1.101961e-09 0.0000251721 11.564851
+WDR86       3.472813  1.8991429 7.255641 6.562640e-09 0.0000749552  9.795647
+FAM47E      1.759637  0.6478391 6.949427 1.787144e-08 0.0001360791  8.895032
+SOCS2-AS1   3.005238  1.7027505 6.794346 2.974056e-08 0.0001688394  8.404926
+FGF10       1.863137  0.2197871 6.728301 3.695649e-08 0.0001688394  8.402907
+VSTM4       2.270231  0.6741885 6.537060 6.938344e-08 0.0002381041  7.765783
+ALDH2       2.804879  3.7241013 6.521796 7.296452e-08 0.0002381041  7.455473
+CFH         3.540089  2.9151426 6.468061 8.711087e-08 0.0002487342  7.307661
+WDR86-AS1   2.100319  1.0443320 6.110932 2.831577e-07 0.0007186858  6.422627
+RP3-462E2.3 1.072174 -0.2477018 5.969029 4.523375e-07 0.0010332746  6.269707
+```
 
 
