@@ -147,6 +147,8 @@ One might then wish to know which genes are most differentially expressed in DN 
 ```
 
 ###### Differential Gene Expression 
+library(Biobase)
+library(limma)
 sv=v%>%filter(symbol%in%c("FLT3","DNMT3A","NPM1"))%>%select(lid=labId,sym=symbol,t_vaf)
 sv=sv%>%group_by(lid,sym)%>%summarize(vaf=max(t_vaf,na.rm=T))
 (sv=sv%>%mutate(sym=str_sub(sym,1,1)))
@@ -162,29 +164,23 @@ D=D%>%filter(lid%in%int)%>%arrange(id) # 1246 254; 1532 424; 2538 261 days later
 meta=cpm[names(cpm)[1:2]]
 expr=as.matrix(cpm[int])
 pD=data.frame(sv)
-library(Biobase)
 head(meta)
 rownames(expr)=meta[,2]
-# expr=log2(expr+1)
 eset=ExpressionSet(assayData=expr)
 I=apply(expr,1,median)
-# I=I>2
 I=I>1
 eset=eset[I,]
 eset
 rownames(pD)=int
 pD$State=factor(pD$State,c("DN","DFN"))
 pData(eset)=pD
-exprs(eset)
-eset
-library(limma)
 (design=model.matrix(~pD$State))
 v <- voom(eset,design,plot=TRUE,normalize="quantile")
 fit <- lmFit(v,design)
 efitM <- eBayes(fit)
 tb=topTable(efitM, coef=2, adjust="BH",number=2000)
-View(tb)
 head(tb,10)
+
              logFC  AveExpr        t      P.Value   adj.P.Val        B
 ALDH2     2.821242 3.724876 6.428361 9.989863e-08 0.001191195 7.307082
 CFH       3.594912 2.902327 6.277209 1.644615e-07 0.001191195 6.845075
