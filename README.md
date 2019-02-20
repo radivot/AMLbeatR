@@ -16,18 +16,11 @@ To use AMLbeatR you must first download a [290 MB excel file](https://static-con
 library(AMLbeatR)  #loads installed package AMLbeatR into memory 
 mkBeatAML() #makes ~/data/BeatAML/BeatAML.Rdata containing clinical, variant, and expression tibbles
 load("~/data/BeatAML/BeatAML.RData") #loads  clinical (clin), variant (v), and expression (cpm) tibbles  
-d=mkListColTib(clin,v,cpm)  #make list column tibble d 
-View(d)   #Rows are patients and data is a list column of dataframes where rows are multiple samples per patient.
-D=d%>%unnest() #reverse nesting to get back to 672 samples being rows
-View(D)
-eids=names(cpm)[-c(1:2)] #451 RNAseq measurements
-vids=unique(v$labId) #608 variant samples
-int=intersect(eids,vids) #399 samples have RNA and DNA readouts
-De=D%>%filter(lid%in%eids)
-De=De%>%group_by(id)%>%nest() #411 patients have 451 RNAseqs
-Dv=D%>%filter(lid%in%vids)
-Dv=Dv%>%group_by(id)%>%nest() #519 patients have 608 DNAseqs
-intp=intersect(De$id,Dv$id) #376 patients have RNA and DNA reads 
+(vids=sort(unique(v$labId))) #608 have at least one variant
+(eids=names(cpm)[-c(1:2)]) #451 RNAseq measurements go 12-xx to 16-xx
+(cvids=clin$LabId[clin$DNAseq]) #622 had DNAseq done on them =>14 AMLs with no variants
+(int=intersect(eids,cvids)) #405 samples have RNA and DNA readouts (group of interest)
+(int1=intersect(eids,vids)) #399 => 6 with both had no variants 
 ``` 
 
 ## Example 1
@@ -37,9 +30,11 @@ in the clinical data tibble clin the following code shows minimal differences
 ![](docs/LdhFLT3C.png)
 
 ```
+(d=tidyClin(clin)) # 672  specimens (rows in clin) from 562 pts (rows in d)
 D=d%>%unnest()%>%filter(!is.na(FLT3c))
 table(D$FLT3c,useNA="always")
 D$FLT3c=c("WT","Mutant")[D$FLT3c+1]
+library(ggplot2)
 tc=function(sz) theme_classic(base_size=sz);
 D%>%ggplot(aes(x=FLT3c,y=LDH))+scale_y_log10()+geom_boxplot(alpha=0)+geom_jitter(width=.15)+
   ylab("Lactate Dehydrogenase")+tc(14)
@@ -83,7 +78,7 @@ D=left_join(D,sv)
 gx=xlab("FLT3 mutant VAF")
 D%>%filter(!is.na(vaf))%>%ggplot(aes(x=vaf,y=LDH))+gx+tc(15)+geom_point()+geom_smooth(method="loess")
 ggsave("~/Results/AML/LdhFLT3vaf.png",width=4,height=3)
-summary(lm(expr~vaf,data=D%>%filter(vaf>0))) # P = 0.000635
+summary(lm(LDH~vaf,data=D%>%filter(vaf>0))) 
 ```
 
 Finally, what about LDH and insertion length? 

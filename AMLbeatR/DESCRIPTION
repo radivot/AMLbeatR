@@ -4,9 +4,10 @@ Title: Facilitates Beat AML Data Analyses
 Version: 0.1.0
 Author: Tomas Radivoyevitch
 Maintainer: Tomas Radivoyevitch <radivot@ccf.org>
-Description: The goal of this project is to organize Beat AML Data as a list-column tibble.
+Description: Organizes Beat AML Data for R programmers. 
 Encoding: UTF-8
-Depends: dplyr, openxlsx, tidyr, stringr 
+Depends: dplyr
+Imports: openxlsx, purrr,tidyr, stringr
 License: GPL (>= 2)
 LazyData: true
 RoxygenNote: 6.1.1
