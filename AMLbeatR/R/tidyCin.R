@@ -15,16 +15,17 @@
 #'@export
 #'@import  dplyr   
 #'@importFrom stringr str_detect
-#'@importFrom tidyr nest
+#'@importFrom tidyr nest unnest
 #'@importFrom purrr map map_chr map_dbl
 
 tidyClin<-function(clin=clin)  {
   sex=PatientId=id=LabId=consensus_sex=age=ageAtDiagnosis=inferred_ethnicity=race=NULL
-  surv=overallSurvival=status=vitalStatus=t=timeOfSampleCollectionRelativeToInclusion=NULL
+  lid=surv=overallSurvival=status=vitalStatus=t=timeOfSampleCollectionRelativeToInclusion=NULL
   LDH=PBB=BMB=FLT3ITD=FLT3c=NPM1=NPM1c=tis=specimenType=RNA=DNA=data=trt=mostRecentTreatmentType=NULL
+  inputs=timeNsrc=outputs=genetics=NULL
   
-  library(tidyverse)
-  load("~/data/BeatAML/BeatAML.RData")
+  # library(tidyverse)
+  # load("~/data/BeatAML/BeatAML.RData")
   
   d=clin%>%select(id=PatientId,lid=LabId,sex=consensus_sex,age=ageAtDiagnosis,race=inferred_ethnicity,
                   surv=overallSurvival,status=vitalStatus,
@@ -75,7 +76,7 @@ tidyClin<-function(clin=clin)  {
   U=c("trt")
   Y=c("LDH","PBB","BMB")
   X=c("FLT3c", "NPM1c")
-  system.time(
+  system.time( 
   d<-D%>%mutate(timeNsrc=map(data,function(x) x[SH] ) ,  #### this takes 0.9 secs!!!
              inputs=map(data,function(x) x[U] ),
              outputs=map(data,function(x) x[Y] ),
