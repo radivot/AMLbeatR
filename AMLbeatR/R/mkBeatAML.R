@@ -44,11 +44,11 @@ mkBeatAML<-function(beatHome="~/data/BeatAML",beatFile="41586_2018_623_MOESM3_ES
   clin=read.xlsx(inF,sheet=5)
   # u=unique(wesIDs$labId) #622=>all are unique, so skip SeqID
   # u=unique(clin$LabId) #672=>all clin lids are unique
-  clin$DNAseq=FALSE
-  clin$RNAseq=FALSE
+  clin$DNA=0
+  clin$RNA=0
   rownames(clin)=clin$LabId
-  clin[wesIDs$labId,"DNAseq"]=TRUE
-  clin[rnaIDs$labId,"RNAseq"]=TRUE
+  clin[wesIDs$labId,"DNA"]=1
+  clin[rnaIDs$labId,"RNA"]=1
   # names(clin)
   save(clin,v,cpm,file=outF)
   cat("Beat AML data has been written to: ",outF,"\n")
