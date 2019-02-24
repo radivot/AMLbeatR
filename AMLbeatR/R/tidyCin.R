@@ -9,8 +9,13 @@
 #'@examples
 #' library(AMLbeatR)
 #' load("~/data/BeatAML/BeatAML.RData") # 672  specimens (rows in clin) 
-#' (d=mkListColTib(clin,v,cpm)) # collected from 562 patients (rows in d)
+#' (d=tidyClin(clin)) # collected from 562 patients (rows in d)
 #' (D=d%>%unnest()) 
+#' (D=d%>%unnest(timeNsrc))
+#' (D=d%>%unnest(genetics))
+#' (D=d%>%unnest(inputs))
+#' (D=d%>%unnest(outputs))
+#' 
 #'@name tidyClin
 #'@export
 #'@import  dplyr   
@@ -31,10 +36,10 @@ tidyClin<-function(clin=clin)  {
                   surv=overallSurvival,status=vitalStatus,
                   LDH,PBB="%.Blasts.in.PB",BMB="%.Blasts.in.BM",tis=specimenType,DNA,RNA,trt=mostRecentTreatmentType,t=timeOfSampleCollectionRelativeToInclusion,
                   FLT3c="FLT3-ITD",NPM1c=NPM1)%>%
-                  mutate(status=ifelse(status=="Dead",1,ifelse(status=="Alive",0,NA)),
-                        NPM1c=ifelse(NPM1c=="positive",1,ifelse(NPM1c=="negative",0,NA)),
-                        FLT3c=ifelse(FLT3c=="positive",1,ifelse(FLT3c=="negative",0,NA))
-                        )
+    mutate(status=ifelse(status=="Dead",1,ifelse(status=="Alive",0,NA)),
+           NPM1c=ifelse(NPM1c=="positive",1,ifelse(NPM1c=="negative",0,NA)),
+           FLT3c=ifelse(FLT3c=="positive",1,ifelse(FLT3c=="negative",0,NA))
+    )
   d$race[which(str_detect(d$race,"White"))]="White"
   d$race[which(str_detect(d$race,"Black"))]="Black"
   d$race[which(str_detect(d$race,"Asian"))]="Other"  #races as in SEERaBomb
@@ -52,37 +57,40 @@ tidyClin<-function(clin=clin)  {
   d$trt[which(str_detect(d$trt,"Targeted Therapy - Other"))]="TTO"
   d$trt[which(str_detect(d$trt,"Palliative"))]="SPC"
   d$LDH=as.numeric(d$LDH)
+  options(warn=-1)
   d$PBB=as.numeric(d$PBB)
   d$BMB=as.numeric(d$BMB)
+  options(warn=0)
   d=d%>%group_by(id,sex,status)%>%nest()%>%arrange(id)
   d=d%>%mutate(race=map_chr(data,function(x) x$race[!is.na(x$race)][1] ), #grab first non-missing race in patient group
-            age=map_dbl(data,function(x) mean(x$age,na.rm=T) ), #fix two age at diagnosis values for 1 pt
-            surv=map_dbl(data,function(x) mean(x$surv,na.rm=T) ), #fix two surv times for same pt
-            n=map_dbl(data,function(x) dim(x)[1]), #fix two surv times for same pt
-            data=map(data,function(x) x%>%select(-race,-age,-surv) )
-             )%>%select(-data,everything())
+               age=map_dbl(data,function(x) mean(x$age,na.rm=T) ), #fix two age at diagnosis values for 1 pt
+               surv=map_dbl(data,function(x) mean(x$surv,na.rm=T) ), #fix two surv times for same pt
+               n=map_dbl(data,function(x) dim(x)[1]), #fix two surv times for same pt
+               data=map(data,function(x) x%>%select(-race,-age,-surv) )
+  )%>%select(-data,everything())
   D=d%>%unnest()
   # Nature Absract: 672 tumour specimens (rows in D) collected from 562 patients (rows in d)
-  (D=D%>%select(id,sex,race,age,surv,status,n,lid,t,tis,DNA,RNA,trt,LDH,PBB,BMB,FLT3c,NPM1c))
+  # (D=D%>%select(id,sex,race,age,surv,status,n,lid,t,tis,DNA,RNA,trt,LDH,PBB,BMB,FLT3c,NPM1c))
+  (D=D%>%select(id,sex,race,age,surv,status,t,LDH,BMB,lid,tis,DNA,RNA,FLT3c,NPM1c))
   # dput(names(D))
-  (D=D%>%group_by(id,sex,race,age,surv,status,n)%>%nest(lid:NPM1c))
+  (d=D%>%group_by(id,sex,race,age,surv,status)%>%nest())
   # system.time(
   # D%>%mutate(timeNsrc=map(data,function(x) x%>%select(lid:RNA) ) ,  #### this takes 2.5 secs!!!
   #            u=map(data,function(x) x%>%select(trt) ),
   #            x=map(data,function(x) x%>%select(FLT3c,NPM1c) ),
   #            y=map(data,function(x) x%>%select(LDH) ))%>%select(-data)
   # )
-  SH=c("lid", "t", "tis", "DNA", "RNA")
-  U=c("trt")
-  Y=c("LDH","PBB","BMB")
-  X=c("FLT3c", "NPM1c")
-  system.time( 
-  d<-D%>%mutate(timeNsrc=map(data,function(x) x[SH] ) ,  #### this takes 0.9 secs!!!
-             inputs=map(data,function(x) x[U] ),
-             outputs=map(data,function(x) x[Y] ),
-             genetics=map(data,function(x) x[X] ))%>%select(-data)
-  )
-  d
+  # SH=c("lid", "t", "tis", "DNA", "RNA")
+  # U=c("trt")
+  # Y=c("LDH","PBB","BMB")
+  # X=c("FLT3c", "NPM1c")
+  # system.time( 
+  # d<-D%>%mutate(timeNsrc=map(data,function(x) x[SH] ) ,  #### this takes 0.9 secs!!!
+  #            inputs=map(data,function(x) x[U] ),
+  #            outputs=map(data,function(x) x[Y] ),
+  #            genetics=map(data,function(x) x[X] ))%>%select(-data)
+  # )
+  # d
   # system.time({
   #   d<-D%>%mutate(timeNsrc=map(data,function(x) x[SH]))  #### this takes 0.9 secs!!!
   #     d<-d%>%mutate(inputs=map(data,function(x) x[U] ))
@@ -98,10 +106,11 @@ tidyClin<-function(clin=clin)  {
   #            y=map(data,function(x) x[Y] ))%>%select(-data)
   # )
   # d
-  d%>%unnest()
-  d%>%unnest(timeNsrc)
-  d%>%unnest(inputs)
-  d%>%unnest(outputs)
-  d%>%unnest(genetics)
+  # d%>%unnest()
+  # d%>%unnest(timeNsrc)
+  # d%>%unnest(inputs)
+  # d%>%unnest(outputs)
+  # d%>%unnest(genetics)
   d
+  
 }

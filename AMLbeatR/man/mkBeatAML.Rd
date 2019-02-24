@@ -23,8 +23,8 @@ of J.W. Tyner et al. (Nature 562 2018) into dataframes clin, v and cpm in an R b
 }
 \note{
 The goal here is simply to make reading the files into R faster via a binary file. Slapped on 
-to clin are DNAseq and RNAseq TRUE/FALSE columns via sheets 12 and 13. This is to replace
-exomeSeq and rnaSeq clin columns.
+to clin are DNA and RNA TRUE/FALSE columns via sheets 12 and 13. These are more trustworth than the columns
+exomeSeq and rnaSeq in clin
 }
 \examples{
 library(AMLbeatR)
@@ -32,7 +32,7 @@ mkBeatAML()
 load("~/data/BeatAML/BeatAML.RData")
 (vids=sort(unique(v$labId))) #608 have at least one variant
 (eids=names(cpm)[-c(1:2)]) #451 RNAseq measurements go 12-xx to 16-xx
-(cvids=clin$LabId[clin$DNAseq]) #622 had DNAseq done on them =>14 AMLs with no variants
+(cvids=clin$LabId[clin$DNA]) #622 had DNAseq done on them =>14 AMLs with no variants
 (int=intersect(eids,cvids)) #405 samples have RNA and DNA readouts (group of interest)
 (int1=intersect(eids,vids)) #399 => 6 with both had no variants 
 }

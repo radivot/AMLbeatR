@@ -21,8 +21,13 @@ Inspired by Chapter 25 in R4DS, with countries as patients.
 \examples{
 library(AMLbeatR)
 load("~/data/BeatAML/BeatAML.RData") # 672  specimens (rows in clin) 
-(d=mkListColTib(clin,v,cpm)) # collected from 562 patients (rows in d)
+(d=tidyClin(clin)) # collected from 562 patients (rows in d)
 (D=d\%>\%unnest()) 
+(D=d\%>\%unnest(timeNsrc))
+(D=d\%>\%unnest(genetics))
+(D=d\%>\%unnest(inputs))
+(D=d\%>\%unnest(outputs))
+
 }
 \author{
 Tom Radivoyevitch
