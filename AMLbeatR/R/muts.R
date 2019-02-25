@@ -43,12 +43,6 @@ muts<-function(d,v,n=10)  {
   # sv
   D=d%>%unnest()
   D=left_join(D,sv)
-  attr(D,"n")=n
-  attr(D,"topv")=t
-  attr(D,"topp")=tp
-  # sort(t[names(tp)]/tp,decreasing=TRUE)
-  attr(D,"vpRatio")=sort(t[names(tp)]/tp)
-  # attributes(D)
   # x=c("d","sss","dsd")
   # x=c(NA,"sss","dsd")
   # x=c(NA,NA)
@@ -64,5 +58,11 @@ muts<-function(d,v,n=10)  {
   # D
   D=D%>%nest(t:vafs)%>%mutate(data=map(data,function(x){x$muts=getLong(x$muts);x$vafs=getLong(x$vafs);return(x)}))
   D=D%>%unnest()
+  attr(D,"n")=n
+  attr(D,"topv")=t
+  attr(D,"topp")=tp
+  # sort(t[names(tp)]/tp,decreasing=TRUE)
+  attr(D,"vpRatio")=sort(t[names(tp)]/tp)
+  # attributes(D)
   D
 }
