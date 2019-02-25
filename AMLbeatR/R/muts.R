@@ -17,11 +17,11 @@
 #'@export
 #'@import  dplyr   
 #'@importFrom tidyr nest unnest
-#'@importFrom stringr str_c
+#'@importFrom stringr str_c str_length
 #'@importFrom purrr map map_chr map_dbl
 
 muts<-function(d,v,n=10)  {
-  labId=lid=vaf=t_vaf=symbol=data=NULL
+  labId=lid=vaf=t_vaf=symbol=data=muts=vafs=NULL
   
   # library(tidyverse)
   # library(AMLbeatR)
@@ -34,6 +34,7 @@ muts<-function(d,v,n=10)  {
   (top=names(t))
   sv=v%>%select(lid=labId,vaf=t_vaf,sym=symbol)%>%filter(sym%in%top)
   sv=sv%>%group_by(lid,sym)%>%summarize(vaf=max(vaf,na.rm=T))
+  (tp=sort(table(sv$sym),decreasing=T)[1:n])
   sv=sv%>%group_by(lid)%>%nest()
   sv=sv%>%mutate(muts=map_chr(data,function(x) str_c(x$sym,collapse="/")),
                  vafs=map_chr(data,function(x) str_c(round(x$vaf,1),collapse="/"))
@@ -42,5 +43,26 @@ muts<-function(d,v,n=10)  {
   # sv
   D=d%>%unnest()
   D=left_join(D,sv)
+  attr(D,"n")=n
+  attr(D,"topv")=t
+  attr(D,"topp")=tp
+  # sort(t[names(tp)]/tp,decreasing=TRUE)
+  attr(D,"vpRatio")=sort(t[names(tp)]/tp)
+  # attributes(D)
+  # x=c("d","sss","dsd")
+  # x=c(NA,"sss","dsd")
+  # x=c(NA,NA)
+  getLong=function(x) {
+   if (all(is.na(x))) return (x) else {
+     k=which(str_length(x)==max(str_length(x),na.rm=T))
+     k=k[length(k)]
+     x[is.na(x)]=x[k]
+     return(x)
+   }
+  }
+  # getLong(x)
+  # D
+  D=D%>%nest(t:vafs)%>%mutate(data=map(data,function(x){x$muts=getLong(x$muts);x$vafs=getLong(x$vafs);return(x)}))
+  D=D%>%unnest()
   D
 }
