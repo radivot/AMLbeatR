@@ -41,6 +41,8 @@ mkBeatAML<-function(beatHome="~/data/BeatAML",beatFile="41586_2018_623_MOESM3_ES
   rnaIDs=read.xlsx(inF,sheet=13) # 451
   cpm=read.xlsx(inF,sheet=9) #counts per million reads
   v=read.xlsx(inF,sheet=7)
+  av=read.xlsx(inF,sheet=16)
+  rpkm=read.xlsx(inF,sheet=8)
   clin=read.xlsx(inF,sheet=5)
   # u=unique(wesIDs$labId) #622=>all are unique, so skip SeqID
   # u=unique(clin$LabId) #672=>all clin lids are unique
@@ -50,6 +52,6 @@ mkBeatAML<-function(beatHome="~/data/BeatAML",beatFile="41586_2018_623_MOESM3_ES
   clin[wesIDs$labId,"DNA"]=1
   clin[rnaIDs$labId,"RNA"]=1
   # names(clin)
-  save(clin,v,cpm,file=outF)
+  save(clin,v,cpm,av,rpkm,file=outF)
   cat("Beat AML data has been written to: ",outF,"\n")
 }
