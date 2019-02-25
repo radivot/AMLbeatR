@@ -95,6 +95,7 @@ muts<-function(d,v,n=10)  {
   attr(D,"topp")=tp
   # sort(t[names(tp)]/tp,decreasing=TRUE)
   attr(D,"vpRatio")=sort(t[names(tp)]/tp)
+  attr(D,"tots")=tots
   # attributes(D)
   D
 }
