@@ -71,7 +71,7 @@ tidyClin<-function(clin=clin)  {
   D=d%>%unnest()
   # Nature Absract: 672 tumour specimens (rows in D) collected from 562 patients (rows in d)
   # (D=D%>%select(id,sex,race,age,surv,status,n,lid,t,tis,DNA,RNA,trt,LDH,PBB,BMB,FLT3c,NPM1c))
-  (D=D%>%select(id,sex,race,age,surv,status,t,LDH,BMB,lid,tis,DNA,RNA,FLT3c,NPM1c))
+  (D=D%>%select(id,sex,race,age,surv,status,t,LDH,BMB,PBB,lid,tis,DNA,RNA,FLT3c,NPM1c))
   # dput(names(D))
   (d=D%>%group_by(id,sex,race,age,surv,status)%>%nest())
   # system.time(
