@@ -14,7 +14,7 @@ muts(d, v, n = 10)
 \item{n}{Top n most frequent mutations are encodes in the muts field}
 }
 \value{
-d with additional columns od muts and vafs separated by /
+d with additional columns of muts and vafs separated by / and point mutantion counts
 }
 \description{
 Adds mutation information from the variance dataframe v to the genetics list column of clin

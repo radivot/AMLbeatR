@@ -5,7 +5,7 @@
 #'@param d  Clinical dataframe made by tidyClin
 #'@param v     Variant dataframe made by mkBeatAML
 #'@param n     Top n most frequent mutations are encodes in the muts field
-#'@return  d with additional columns od muts and vafs separated by / 
+#'@return  d with additional columns of muts and vafs separated by / and point mutantion counts
 #'@author Tom Radivoyevitch
 #'@examples
 #' library(AMLbeatR)
@@ -16,12 +16,12 @@
 #'@name muts
 #'@export
 #'@import  dplyr   
-#'@importFrom tidyr nest unnest
+#'@importFrom tidyr nest unnest unite
 #'@importFrom stringr str_c str_length
 #'@importFrom purrr map map_chr map_dbl
 
 muts<-function(d,v,n=10)  {
-  labId=lid=vaf=t_vaf=symbol=data=muts=vafs=NULL
+  labId=lid=vaf=t_vaf=symbol=data=muts=vafs=ref=alt=mut1=cnts=insLen=NULL
   
   # library(tidyverse)
   # library(AMLbeatR)
@@ -58,6 +58,38 @@ muts<-function(d,v,n=10)  {
   # D
   D=D%>%nest(t:vafs)%>%mutate(data=map(data,function(x){x$muts=getLong(x$muts);x$vafs=getLong(x$vafs);return(x)}))
   D=D%>%unnest()
+  D
+  
+  sv=v%>%select(ref,alt,lid=labId)%>%mutate(insLen=str_length(alt)-str_length(ref))%>%filter(insLen==0)
+  sv=sv%>%unite(mut1,ref:alt,sep=">")%>%select(-insLen)
+  map6=function(x) {
+    # x=sv$mut1
+    x[str_detect(x,"A>G")]="T>C"
+    x[str_detect(x,"A>T")]="T>A"
+    x[str_detect(x,"A>C")]="T>G"
+    x[str_detect(x,"G>A")]="C>T"
+    x[str_detect(x,"G>T")]="C>A"
+    x[str_detect(x,"G>C")]="C>G"
+    x
+  }
+  sv=sv%>%mutate(mut1=map6(mut1))
+  # head(sv)
+  mkTab=function(x) {
+    # x=sv
+    t=table(x$mut1)
+    y=as.list(as.numeric(t))
+    names(y)=names(t)
+    as_tibble(y)
+  }  
+  
+  ord=c("C>A","C>G","C>T","T>A","T>G","T>C")
+  (tots=mkTab(sv))
+  sv=sv%>%group_by(lid)%>%nest()%>%mutate(cnts=map(data,mkTab))%>%unnest(cnts)%>%select(-data)
+  sv=sv[c("lid",ord)]
+  # sv
+  sv[is.na(sv)]=0
+  D=left_join(D,sv)
+  
   attr(D,"n")=n
   attr(D,"topv")=t
   attr(D,"topp")=tp
