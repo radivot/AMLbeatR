@@ -4,17 +4,19 @@
 \alias{muts}
 \title{Add Mutations to Clinical Data}
 \usage{
-muts(d, v, n = 10)
+muts(d, v, pv = v, n = 10)
 }
 \arguments{
 \item{d}{Clinical dataframe made by tidyClin}
 
-\item{v}{Variant dataframe made by mkBeatAML}
+\item{v}{Variant dataframe v made by mkBeatAML}
 
-\item{n}{Top n most frequent mutations are encodes in the muts field}
+\item{pv}{Either v or av (all variants, ~2-fold more) made by mkBeatAML  Used to get point mutation columns as damage readouts.}
+
+\item{n}{Top n most frequent mutations are encoded in  muts in  output}
 }
 \value{
-d with additional columns of muts and vafs separated by / and point mutantion counts
+d with additional columns of muts and vafs separated by / and point mutantion counts via av
 }
 \description{
 Adds mutation information from the variance dataframe v to the genetics list column of clin
@@ -23,7 +25,7 @@ Adds mutation information from the variance dataframe v to the genetics list col
 library(AMLbeatR)
 load("~/data/BeatAML/BeatAML.RData") # 672  specimens (rows in clin) 
 (d=tidyClin(clin)) # collected from 562 patients (rows in d)
-(d=muts(d,v)) 
+(d=muts(d,v,av)) 
 (D=d\%>\%unnest()) 
 }
 \author{

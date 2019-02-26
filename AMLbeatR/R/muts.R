@@ -3,15 +3,16 @@
 #'Adds mutation information from the variance dataframe v to the genetics list column of clin 
 #'
 #'@param d  Clinical dataframe made by tidyClin
-#'@param v     Variant dataframe made by mkBeatAML
-#'@param n     Top n most frequent mutations are encodes in the muts field
-#'@return  d with additional columns of muts and vafs separated by / and point mutantion counts
+#'@param v     Variant dataframe v made by mkBeatAML
+#'@param pv     Either v or av (all variants, ~2-fold more) made by mkBeatAML  Used to get point mutation columns as damage readouts.
+#'@param n     Top n most frequent mutations are encoded in  muts in  output
+#'@return  d with additional columns of muts and vafs separated by / and point mutantion counts via av
 #'@author Tom Radivoyevitch
 #'@examples
 #' library(AMLbeatR)
 #' load("~/data/BeatAML/BeatAML.RData") # 672  specimens (rows in clin) 
 #' (d=tidyClin(clin)) # collected from 562 patients (rows in d)
-#' (d=muts(d,v)) 
+#' (d=muts(d,v,av)) 
 #' (D=d%>%unnest()) 
 #'@name muts
 #'@export
@@ -20,7 +21,7 @@
 #'@importFrom stringr str_c str_length
 #'@importFrom purrr map map_chr map_dbl
 
-muts<-function(d,v,n=10)  {
+muts<-function(d,v,pv=v,n=10)  {
   labId=lid=vaf=t_vaf=symbol=data=muts=vafs=ref=alt=mut1=cnts=insLen=NULL
   
   # library(tidyverse)
@@ -60,7 +61,7 @@ muts<-function(d,v,n=10)  {
   D=D%>%unnest()
   D
   
-  sv=v%>%select(ref,alt,lid=labId)%>%mutate(insLen=str_length(alt)-str_length(ref))%>%filter(insLen==0)
+  sv=pv%>%select(ref,alt,lid=labId)%>%mutate(insLen=str_length(alt)-str_length(ref))%>%filter(insLen==0)
   sv=sv%>%unite(mut1,ref:alt,sep=">")%>%select(-insLen)
   map6=function(x) {
     # x=sv$mut1
