@@ -32,7 +32,7 @@ geXL<-function(d,v,cpm,f="~/Results/AML/topGE.xlsx",N=1000)  {
   # library(openxlsx)
   # load("~/data/BeatAML/BeatAML.RData")
   # (d=tidyClin(clin))
-  # n=30
+  # n=5
   # d=muts(d,v,av,n)
   # N=1000
   # f="~/Results/AML/topGE.xlsx"
@@ -43,7 +43,7 @@ geXL<-function(d,v,cpm,f="~/Results/AML/topGE.xlsx",N=1000)  {
   wb <- createWorkbook() 
   addWorksheet(wb,"clinical")
   writeData(wb,"clinical",data.frame("Beat AML Clinical Data"), startRow=1,startCol=1,colNames=F)
-  writeData(wb,"clinical",data.frame(paste("Top",n,"genes")), startRow=1,startCol=17,colNames=F)
+  writeData(wb,"clinical",data.frame(paste("Top",N,"genes")), startRow=1,startCol=17,colNames=F)
   writeData(wb,"clinical",data.frame("Point muts in all variants in Table S16"), startRow=1,startCol=19,colNames=F)
   writeData(wb,"clinical",d, startRow=2,startCol=1,headerStyle = hs1)
   freezePane(wb, "clinical" ,firstActiveRow = 3,  firstActiveCol = 8)
@@ -54,18 +54,23 @@ geXL<-function(d,v,cpm,f="~/Results/AML/topGE.xlsx",N=1000)  {
   setColWidths(wb, "clinical", cols=18, widths = 16)
   setColWidths(wb, "clinical", cols=19:24, widths = 4)
   
-  attributes(d)
-  (loop=names(attr(d,"topp")))
-  for (i in 1:length(loop)) {
-    # i="TET2"
+  # attributes(d)
+  (loop=names(attr(d,"topv")))
+  n=length(loop)
+  for (i in 1:n) {
+    # i=1
     g=loop[i]
     cat("Working on ",i," out of top ",n," mutated genes:",g,"\n")
     tb=geDiffs(g,v,cpm,N=N)
+    nms=names(attr(tb,"counts"))
+    cnts=as.numeric(attr(tb,"counts"))
+    hd=paste("Number of GE Samples: ",nms[1]," = ",cnts[1],"  ",nms[2]," = ",cnts[2],sep="",collapse="")
     # head(tb)
     addWorksheet(wb,g)
+    writeData(wb,g,data.frame(hd), startRow=1,startCol=1,colNames=F)
     # writeData(wb,i,tb, startRow=1,startCol=1,headerStyle = hs1,rowNames=TRUE)
-    writeData(wb,g,cbind(gene=row.names(tb),tb), startRow=1,startCol=1,headerStyle = hs1)
-    freezePane(wb,g,firstActiveRow = 2,  firstActiveCol = 2)
+    writeData(wb,g,cbind(gene=row.names(tb),tb), startRow=2,startCol=1,headerStyle = hs1)
+    freezePane(wb,g,firstActiveRow = 3)
     setColWidths(wb, g, cols=1, widths = 16)
   }
   

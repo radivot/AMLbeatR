@@ -34,7 +34,7 @@ geDiffs<-function(gene,v,cpm,N=2000,cutOff=1)  {
   # library(limma)
   # load("~/data/BeatAML/BeatAML.RData")
   # # (d=tidyClin(clin)) # collected from 562 patients (rows in d)
-  # n=2000
+  # N=2000
   # cutOff=1
   # gene="TET2"
   
@@ -69,5 +69,7 @@ geDiffs<-function(gene,v,cpm,N=2000,cutOff=1)  {
   v <- voom(eset,design,plot=TRUE,normalize.method="quantile")
   fit <- lmFit(v,design)
   efitM <- eBayes(fit)
-  topTable(efitM, coef=2, adjust.method="BH",number=N)
+  tb=topTable(efitM, coef=2, adjust.method="BH",number=N)
+  attr(tb,"counts")<-table(pD$State)
+  tb
 }
