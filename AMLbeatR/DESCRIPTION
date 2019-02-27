@@ -6,8 +6,8 @@ Author: Tomas Radivoyevitch
 Maintainer: Tomas Radivoyevitch <radivot@ccf.org>
 Description: Organizes Beat AML Data for R programmers. 
 Encoding: UTF-8
-Depends: dplyr
-Imports: Biobase, limma, openxlsx, purrr,tidyr, stringr
+Depends: dplyr, openxlsx
+Imports: Biobase, limma, purrr,tidyr, stringr
 License: GPL (>= 2)
 LazyData: true
 RoxygenNote: 6.1.1

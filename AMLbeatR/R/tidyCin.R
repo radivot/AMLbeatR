@@ -63,8 +63,10 @@ tidyClin<-function(clin=clin)  {
   options(warn=0)
   d=d%>%group_by(id,sex,status)%>%nest()%>%arrange(id)
   d=d%>%mutate(race=map_chr(data,function(x) x$race[!is.na(x$race)][1] ), #grab first non-missing race in patient group
-               age=map_dbl(data,function(x) mean(x$age,na.rm=T) ), #fix two age at diagnosis values for 1 pt
-               surv=map_dbl(data,function(x) mean(x$surv,na.rm=T) ), #fix two surv times for same pt
+               age=map_dbl(data,function(x) x$age[!is.na(x$age)][1] ), #grab first non-missing age in patient group
+               surv=map_dbl(data,function(x) x$surv[!is.na(x$surv)][1] ), #grab first non-missing surv in patient group
+               # age=map_dbl(data,function(x) mean(x$age,na.rm=T) ), #fix two age at diagnosis values for 1 pt
+               # surv=map_dbl(data,function(x) mean(x$surv,na.rm=T) ), #fix two surv times for same pt
                n=map_dbl(data,function(x) dim(x)[1]), #fix two surv times for same pt
                data=map(data,function(x) x%>%select(-race,-age,-surv) )
   )%>%select(-data,everything())

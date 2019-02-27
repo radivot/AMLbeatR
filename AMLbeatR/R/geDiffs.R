@@ -6,7 +6,7 @@
 #@param d  Clinical dataframe made by tidyClin
 #'@param v     Variant dataframe v made by mkBeatAML
 #'@param cpm     Counts per million dataframe cpm made by mkBeatAML
-#'@param n     Top n most differentially expressed genes
+#'@param N     Top N most differentially expressed genes
 #'@param cutOff     Counts per million reads below which a gene is ignored (median across samples)
 #'@return  Returns Limma's topTable(X, coef=2, adjust="BH",number=n)
 #'@author Tom Radivoyevitch
@@ -24,7 +24,7 @@
 #'@importFrom stringr str_c str_length
 #'@importFrom purrr map map_chr map_dbl
 
-geDiffs<-function(gene,v,cpm,n=2000,cutOff=1)  {
+geDiffs<-function(gene,v,cpm,N=2000,cutOff=1)  {
   # labId=lid=vaf=t_vaf=symbol=data=muts=vafs=ref=alt=mut1=cnts=insLen=NULL
   labId=lid=vaf=t_vaf=symbol=data=muts=vafs=NULL
   
@@ -69,5 +69,5 @@ geDiffs<-function(gene,v,cpm,n=2000,cutOff=1)  {
   v <- voom(eset,design,plot=TRUE,normalize.method="quantile")
   fit <- lmFit(v,design)
   efitM <- eBayes(fit)
-  topTable(efitM, coef=2, adjust.method="BH",number=n)
+  topTable(efitM, coef=2, adjust.method="BH",number=N)
 }

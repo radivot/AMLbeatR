@@ -4,7 +4,7 @@
 \alias{geDiffs}
 \title{Gene Expression Differences}
 \usage{
-geDiffs(gene, v, cpm, n = 2000, cutOff = 1)
+geDiffs(gene, v, cpm, N = 2000, cutOff = 1)
 }
 \arguments{
 \item{gene}{Gene commonly mutated in AML}
@@ -13,7 +13,7 @@ geDiffs(gene, v, cpm, n = 2000, cutOff = 1)
 
 \item{cpm}{Counts per million dataframe cpm made by mkBeatAML}
 
-\item{n}{Top n most differentially expressed genes}
+\item{N}{Top N most differentially expressed genes}
 
 \item{cutOff}{Counts per million reads below which a gene is ignored (median across samples)}
 }
