@@ -15,7 +15,7 @@ rm(list=ls())
 library(tidyverse)
 library(AMLbeatR)  #loads installed package AMLbeatR into memory 
 mkBeatAML() #Do only once (this takes some time). Makes ~/data/BeatAML/BeatAML.Rdata 
-load("~/data/BeatAML/BeatAML.RData") #loads  clinical (clin), variant (v, av), and expression (rpkm, cpm) tibbles  
+load("~/data/BeatAML/BeatAML.RData") #loads  clinical (clin), variant (v, av), and expression (rpkm, cpm) data  
 (d=tidyClin(clin)) #672 rows in clin, one for each measurement; 562 rows in d, one for each patient
 (d=muts(d,v,av,n=10)) # adds muts and vafs of top n genes and point mutation counts from all variants
 attributes(d) # muts() also added some summary attributes
