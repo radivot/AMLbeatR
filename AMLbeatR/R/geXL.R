@@ -11,8 +11,10 @@
 #'@author Tom Radivoyevitch
 #'@examples
 #' library(AMLbeatR)
-#' load("~/data/BeatAML/BeatAML.RData") # 672  specimens (rows in clin) 
-#' geDiffs("TET2",v,cpm)
+#' load("~/data/BeatAML/BeatAML.RData") 
+#' (d=tidyClin(clin)) #672 rows in clin, one for each measurement; 562 rows in d, one for each patient
+#' (d=muts(d,v,av,n=10)) # adds muts and vafs of top n genes and point mutation counts from all variants
+#' geXL(d,v,cpm,f="~/Results/AML/topGE.xlsx") #first sheet is clinical, rest are mut vs WT DEGs
 #'@name geXL
 #'@export
 #'@import  dplyr openxlsx  
