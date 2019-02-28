@@ -1,6 +1,6 @@
-#'Excel File of Gene Expression Differences 
+#'Excel File of Gene Expression Correlations with VAFs 
 #'
-#'Loops geDiffs() over top n mutated genes making sheets of top N Limma-called differentially expressed genes.
+#'Loops geVAFcor() over top n mutated genes making sheets of top N Limma-called VAF-correlated genes.
 #'
 #'@param d  Clinical dataframe made by muts() after tidyClin() (set number of most mutated genes in muts call
 #'@param v     Variant dataframe v made by mkBeatAML
@@ -12,10 +12,10 @@
 #'@examples
 #' library(AMLbeatR)
 #' load("~/data/BeatAML/BeatAML.RData") 
-#' (d=tidyClin(clin))#672 rows in clin, one for each measurement; 562 rows in d, one for each patient
+#' (d=tidyClin(clin)) #672 rows in clin, one for each measurement; 562 rows in d, one for each patient
 #' (d=muts(d,v,av,n=10))# adds muts and vafs of top n genes and point mut counts from all variants
-#' geXL(d,v,cpm,f="~/Results/AML/topGE.xlsx") #first sheet is clinical, rest are mut vs WT DEGs
-#'@name geXL
+#' geVAFcorXL(d,v,cpm,f="~/Results/AML/topGEvafCor.xlsx")#1st sht = clinical, rest = expr vs vafs
+#'@name geVAFcorXL
 #'@export
 #'@import  dplyr openxlsx  
 #'@importFrom limma voom lmFit eBayes topTable 
@@ -25,7 +25,7 @@
 #'@importFrom stringr str_c str_length
 #'@importFrom purrr map map_chr map_dbl
 
-geXL<-function(d,v,cpm,f="~/Results/AML/topGE.xlsx",N=1000)  {
+geVAFcorXL<-function(d,v,cpm,f="~/Results/AML/topGEvafCor.xlsx",N=1000)  {
   # labId=lid=vaf=t_vaf=symbol=data=muts=vafs=ref=alt=mut1=cnts=insLen=NULL
   labId=lid=vaf=t_vaf=symbol=data=muts=vafs=NULL
   
@@ -37,7 +37,7 @@ geXL<-function(d,v,cpm,f="~/Results/AML/topGE.xlsx",N=1000)  {
   # n=5
   # d=muts(d,v,av,n)
   # N=1000
-  # f="~/Results/AML/topGE.xlsx"
+  # f="~/Results/AML/topGEvafCor.xlsx"
   
   hs1=createStyle(fgFill="#DDDDDD",halign="CENTER",textDecoration="bold")
   # hs2=createStyle(fgFill="#FFFFFF",halign="CENTER",textDecoration="bold")
@@ -65,7 +65,7 @@ geXL<-function(d,v,cpm,f="~/Results/AML/topGE.xlsx",N=1000)  {
     # i=1
     g=loop[i]
     cat("Working on ",i," out of top ",n," mutated genes:",g,"\n")
-    tb=geDiffs(g,v,cpm,N=N)
+    tb=geVAFcor(g,v,cpm,N=N)
     L[[g]]=tb
     nms=names(attr(tb,"counts"))
     cnts=as.numeric(attr(tb,"counts"))
