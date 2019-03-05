@@ -27,6 +27,35 @@ To create an excel file with 10 sheets of differentially expressed genes, one fo
 geXL(d,v,cpm,f="~/Results/AML/topGE.xlsx") #WT vs mut differential gene expression (ge), one per mutated gene
 ``` 
 
+## Low Gene Expression correlations with mutations
+
+The following code generates an excel file (default=~/Results/AML/geQrtMutCorXL.xlsx) with odds ratios
+and P values of correlations between a gene (sheet name) having low expression (1st vs 4th quartile) and another gene (row in a sheet) being mutated. Thus, if you are looking for a gene that, when mutated, mimics TP53 deletion to the extent that it lowers TP53 expression, you can guess from the output below (equal to  sheet "TP53" in the excel file) that SRSF2 is such a gene. The output also shows that FLT3 and NPM1 mutations arise more often when TP53 is not low. 
+
+```
+L=geQrtMutCorXL(d,v,cpm)
+L$TP53
+> L$TP53
+# A tibble: 14 x 4
+   genes         P    OR ORci              
+   <chr>     <dbl> <dbl> <chr>             
+ 1 SRSF2  0.000841 5.82  5.82 (1.86, 24.25)
+ 2 FLT3   0.00259  0.401 0.4  (0.21, 0.74)  
+ 3 NPM1   0.00462  0.360 0.36 (0.17, 0.75) 
+ 4 ASXL1  0.106    2.93  2.93 (0.83, 13)   
+ 5 RUNX1  0.218    1.82  1.82 (0.74, 4.68) 
+ 6 TP53   0.241    1.96  1.96 (0.69, 6.06) 
+ 7 IDH2   0.313    1.64  1.64 (0.68, 4.08) 
+ 8 DNMT3A 0.506    0.758 0.76 (0.37, 1.53) 
+ 9 PTPN11 0.539    0.557 0.56 (0.12, 2.27) 
+10 SF3B1  0.748    1.53  1.53 (0.35, 7.56) 
+11 TET2   1        1.07  1.07 (0.48, 2.42) 
+12 NRAS   1        1.08  1.08 (0.46, 2.56) 
+13 IDH1   1        1.12  1.12 (0.39, 3.26) 
+14 WT1    1        1     1    (0.34, 2.97)  
+```
+
+
 ## Survival
 An independent group recently [reported](https://www.nejm.org/doi/full/10.1056/NEJMoa1516192) 
 that among the four combinations of DNMT3A (D) and NPM1 (N) mutations, FLT3 (F) mutations change survival 
