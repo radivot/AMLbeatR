@@ -72,7 +72,7 @@ sbb=theme(strip.background=element_blank())
 ltp=theme(legend.position="none")
 sy=scale_y_log10()
 dd%>%ggplot(aes(x=State,y=E,color=State))+geom_jitter(size=0.5)+gy+gx+sbb+ltp+sy+facet_wrap(~genes,scales="free")
-ggsave("~/Results/AML/jitter3.png",width=5.5,height=2)
+ggsave("~/Results/AML/jitter3.png",width=5.5,height=2.5)
 ```
 
 ## Survival
