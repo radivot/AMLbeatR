@@ -62,11 +62,12 @@ Scanning the excel sheets, the three most significant (P<1e-8) mutation-expressi
 ```
 genesE=c("FLT3","RUNX1","WT1")
 genesM=c("FLT3","FLT3","NPM1")
-L=map2(genesE,geneM,function(x,y) getExpr(x,y,v,cpm))
+L=map2(genesE,genesM,function(x,y) getExpr(x,y,v,cpm))
 names(L)=genes=paste0(genesM,"mt/",genesE,"expr")
 for (i in genes) L[[i]]$genes=i
 dd=bind_rows(L)
 gx=xlab("")
+gy=ylab("Gene Expression (CPM)")
 sbb=theme(strip.background=element_blank())
 ltp=theme(legend.position="none")
 sy=scale_y_log10()
